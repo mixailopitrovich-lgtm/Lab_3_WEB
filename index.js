@@ -79,4 +79,33 @@ program
     console.log(JSON.stringify(current, null, 2));
   });
 
+  program
+  .command('answers')
+  .description('показати відповіді всіх респондентів на обране питання')
+  .argument('<questionId>', 'номер (id) питання')
+  .action((questionIdText) => {
+    const data = loadData();
+    const questionId = Number(questionIdText);
+    if (!Number.isInteger(questionId)) {
+      fail('id питання має бути цілим числом');
+    }
+    const question = data.questions.find((q) => q.id === questionId);
+    if (!question) {
+      fail(`питання з id ${questionId} не знайдено`);
+    }
+    console.log(`Питання ${question.id}: ${question.text}`);
+    for (const r of data.responses) {
+      const answer = r.answers.find((a) => a.questionId === questionId);
+      let shown;
+      if (!answer || answer.value === null) {
+        shown = '(без відповіді)';
+      } else if (Array.isArray(answer.value)) {
+        shown = answer.value.join(', ');
+      } else {
+        shown = String(answer.value);
+      }
+      console.log(`  ${r.respondentID}: ${shown}`);
+    }
+  });
+
  program.parse();
