@@ -49,5 +49,18 @@ program
         console.log(`${r.respondentID}  ${r.submittedAt}  (відповідей: ${r.answers.length})`)
        }
  })
+ 
+    program
+    .command('show')
+    .description('показати одного респондента цілком')
+    .argument('<respondentId>', 'ідентифікатор респондента')
+    .action((respondentID) => {
+        const data = loadData();
+        const found = data.responses.find((r) => r.respondentID == respondentID);
+        if (!found) {
+            fail(`респондента "${respondentID}" не знайдено`);
+        }
+        console.log(JSON.stringify(found, null, 2));
+    }) 
 
  program.parse();
