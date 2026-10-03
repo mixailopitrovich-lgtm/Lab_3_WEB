@@ -108,4 +108,31 @@ program
     }
   });
 
+  program
+  .command('respondent')
+  .description('показати всі відповіді респондента разом з текстом питань')
+  .argument('<respondentId>', 'ідентифікатор респондента')
+  .action((respondentId) => {
+    const data = loadData();
+    const found = data.responses.find((r) => r.respondentID === respondentId);
+    if (!found) {
+      fail(`респондента "${respondentId}" не знайдено`);
+    }
+    console.log(`Респондент: ${found.respondentID} (${found.submittedAt})`);
+    for (const a of found.answers) {
+      const question = data.questions.find((q) => q.id === a.questionId);
+      const text = question ? question.text : `(питання ${a.questionId} не знайдено)`;
+      let shown;
+      if (a.value === null) {
+        shown = '(без відповіді)';
+      } else if (Array.isArray(a.value)) {
+        shown = a.value.join(', ');
+      } else {
+        shown = String(a.value);
+      }
+      console.log(`  ${a.questionId}. ${text}`);
+      console.log(`     Відповідь: ${shown}`);
+    }
+  });
+
  program.parse();
