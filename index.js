@@ -63,4 +63,20 @@ program
         console.log(JSON.stringify(found, null, 2));
     }) 
 
+    program
+    .command('field')
+    .description('показати значення поля за шляхом, наприклад questions.1.options')
+    .argument('<path>', 'шлях до поля через крапку')
+    .action((fieldPath) => {
+    const data = loadData();
+    let current = data;
+    for (const key of fieldPath.split('.')) {
+      if (current === null || typeof current !== 'object' || !Object.hasOwn(current, key)) {
+        fail(`поле "${fieldPath}" не знайдено (зупинились на "${key}")`);
+      }
+      current = current[key];
+    }
+    console.log(JSON.stringify(current, null, 2));
+  });
+
  program.parse();
