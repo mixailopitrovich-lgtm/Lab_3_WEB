@@ -56,7 +56,7 @@ program
     .argument('<respondentId>', 'ідентифікатор респондента')
     .action((respondentID) => {
         const data = loadData();
-        const found = data.responses.find((r) => r.respondentID == respondentID);
+        const found = data.responses.find((r) => r.respondentID === respondentID);
         if (!found) {
             fail(`респондента "${respondentID}" не знайдено`);
         }
@@ -132,6 +132,34 @@ program
       }
       console.log(`  ${a.questionId}. ${text}`);
       console.log(`     Відповідь: ${shown}`);
+    }
+  });
+
+  program
+  .command('questions')
+  .description('показати перелік питань з відбором')
+  .option('-r, --required', 'показати лише обов\'язкові питання')
+  .option('-t, --type <type>', 'показати лише питання вказаного типу (scale, multiple_choice, text)')
+  .action((options) => {
+    const data = loadData();
+    let items = data.questions;
+    if (options.required) {
+      items = items.filter((q) => q.isRequired === true);
+    }
+    if (options.type !== undefined) {
+      const known = ['scale', 'multiple_choice', 'text'];
+      if (!known.includes(options.type)) {
+        fail(`невідомий тип "${options.type}", доступні: ${known.join(', ')}`);
+      }
+      items = items.filter((q) => q.type === options.type);
+    }
+    if (items.length === 0) {
+      console.log('Питань за цими умовами не знайдено.');
+      return;
+    }
+    for (const q of items) {
+      const mark = q.isRequired ? 'обов\'язкове' : 'необов\'язкове';
+      console.log(`${q.id}. [${q.type}] ${q.text} (${mark})`);
     }
   });
 
