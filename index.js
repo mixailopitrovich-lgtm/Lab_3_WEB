@@ -3,6 +3,18 @@ import { readFileSync } from 'node:fs';
 
 const program = new Command();
 
+program.configureOutput({
+  outputError: (str, write) => {
+    const text = str
+      .replace("error: missing required argument", "Помилка: не вказано обов'язковий аргумент")
+      .replace("error: unknown option", "Помилка: невідома опція")
+      .replace("error: unknown command", "Помилка: невідома команда")
+      .replace("error: option", "Помилка: опція")
+      .replace("error:", "Помилка:");
+    write(text);
+  },
+});
+
 program
  .name('survey')
  .description('CLI для роботи з даними опитування з JSON-файлу')
